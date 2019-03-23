@@ -34,7 +34,7 @@ class PckFile:
         self.line_type = None
 
     def read(self):
-        with open(self.path, "r", encoding="utf-8-sig") as file:
+        with open(self.path, "r", encoding="utf-8-sig", errors="replace") as file:
             return file.read()
 
     def read_bin(self):
@@ -93,5 +93,5 @@ pass
     # file_offset[4]
     # file_compressed_size[4]
     # file_original_size[4]
-    # file_size_?[4]
+    # file_size_difference_?[4]
 # file order doesnt matter

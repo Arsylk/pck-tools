@@ -46,5 +46,3 @@ def read_json(file_path):
 path_kr = "E:/Android/AndroidProjects/RIP Banana/files/locale_kr.pck"
 path_en = "E:/Android/AndroidProjects/RIP Banana/files/locale_en_old.pck"
 path_json = "E:/Android/AndroidProjects/RIP Banana/files/locale.json"
-
-pck_tools.unpack_pck("E:/Android/AndroidProjects/RIP Banana/files/c002_12.pck")
