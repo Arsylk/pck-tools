@@ -2,6 +2,7 @@ from struct import *
 import binascii
 import os
 import shutil
+import json
 
 import pck_crypt
 import pck_struct
@@ -55,6 +56,7 @@ def unpack_pck(path, lang=None):
             pck.add_file(file_path, hash, flag, ext)
             file.seek(start, 0)
         print()
+        pck.write_header()
 
         return pck
 
@@ -104,6 +106,18 @@ def merge_pck(kr_file, en_file, fl_file):
         fl_pck.add_file(fl_path, kr.hash, 00, kr.ext)
 
     return fl_pck
+
+
+def from_header(path):
+    folder = path[:path.rfind("/")]
+    with open(path, "r") as file:
+        _header = json.load(file)
+        pck = pck_struct.Pck(folder, "50434B00CDCCCC3E", len(_header), None)
+        for key in _header:
+            pck.add_file(folder+"/"+key, _header[key], 00, 00)
+            print(pck.get_file(hash=_header[key]))
+        return pck
+
 
 
 def form_dict(dict, line_type, comment):

@@ -20,7 +20,7 @@ if file:
         content = json.dumps(json_full, sort_keys=False, indent=4, ensure_ascii=False).encode("utf-8")
         print(file[:file.rfind("/")])
         print(pck_tools.save_file(content, file[:file.rfind("/")], file[file.rfind("/") + 1:file.rfind(".")]+".json"))
-        pck_tools.clean_up(file)
+        #pck_tools.clean_up(file)
 
 
 input()

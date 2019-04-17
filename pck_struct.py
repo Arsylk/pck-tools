@@ -1,3 +1,6 @@
+import json
+
+
 class Pck:
     def __init__(self, path, head, count, lang=None):
         self.path = path
@@ -17,6 +20,13 @@ class Pck:
 
     def get_files(self):
         return self.files
+
+    def write_header(self):
+        _header = {}
+        for i, file in enumerate(self.files):
+            _header[file.path[file.path.rfind("/")+1:]] = file.hash
+        with open(self.path[:self.path.rfind(".")]+"/_header", "w") as output:
+            output.write(json.dumps(_header, sort_keys=False, indent=4))
 
 
 class PckFile:

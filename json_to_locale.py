@@ -24,9 +24,9 @@ if file:
             print(jsonFile["hash"])
 
             newfile = pck_tools.form_dict(jsonFile["dict"], jsonFile["line_type"], jsonFile["hash"])
-            newfile_path = pck_tools.save_file(newfile, folder, "{:08d}".format(i));
+            newfile_path = pck_tools.save_file(newfile, folder, "{:08d}".format(i))
             pck.add_file(newfile_path, jsonFile["hash"], 00, 00)
 
         print("packing locale!!!")
-        pck_path = pck_tools.save_file(pck_tools.pack_pck(pck), folder[:folder.rfind("/")], file[file.rfind("/")+1:].replace(".json", "")+"_new.pck");
+        pck_path = pck_tools.save_file(pck_tools.pack_pck(pck), folder[:folder.rfind("/")], file[file.rfind("/")+1:].replace(".json", "")+"_new.pck")
         print(pck_path)
