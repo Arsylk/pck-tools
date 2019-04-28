@@ -18,6 +18,10 @@ def save_file(content, dir, name):
         file.write(content)
     return os.path.join(dir, name).replace("\\", "/")
 
+def read_json(path):
+    with open(path, "r", encoding="utf-8", errors="replace") as content:
+        return json.load(content)
+
 
 def unpack_pck(path, lang=None):
     with open(path, "rb") as file:

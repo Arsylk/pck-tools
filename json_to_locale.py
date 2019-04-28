@@ -1,7 +1,6 @@
 import pck_tools
 import pck_struct
 import json
-import time
 from tkinter.filedialog import *
 
 file = None
@@ -14,19 +13,17 @@ else:
 if file:
     file = file.replace("\\", "/")
     folder = file[:file.rfind(".")]
-    
-    with open(file, "r", encoding="utf-8", errors="replace") as content:
-        jsonFiles = json.load(content)
-        
-        pck = pck_struct.Pck(folder, "50434B00CDCCCC3E", len(jsonFiles["files"]), "new en")
-        for i, jsonFile in enumerate(jsonFiles["files"]):
-            jsonFile = jsonFiles["files"][jsonFile]
-            print(jsonFile["hash"])
 
-            newfile = pck_tools.form_dict(jsonFile["dict"], jsonFile["line_type"], jsonFile["hash"])
-            newfile_path = pck_tools.save_file(newfile, folder, "{:08d}".format(i))
-            pck.add_file(newfile_path, jsonFile["hash"], 00, 00)
+    jsonFiles = pck_tools.read_json(file)
+    pck = pck_struct.Pck(folder, "50434B00CDCCCC3E", len(jsonFiles["files"]), "new en")
+    for i, jsonFile in enumerate(jsonFiles["files"]):
+        jsonFile = jsonFiles["files"][jsonFile]
+        print(jsonFile["hash"])
 
-        print("packing locale!!!")
-        pck_path = pck_tools.save_file(pck_tools.pack_pck(pck), folder[:folder.rfind("/")], file[file.rfind("/")+1:].replace(".json", "")+"_new.pck")
-        print(pck_path)
+        newfile = pck_tools.form_dict(jsonFile["dict"], jsonFile["line_type"], jsonFile["hash"])
+        newfile_path = pck_tools.save_file(newfile, folder, "{:08d}".format(i))
+        pck.add_file(newfile_path, jsonFile["hash"], 00, 00)
+
+    print("packing locale!!!")
+    pck_path = pck_tools.save_file(pck_tools.pack_pck(pck), folder[:folder.rfind("/")], file[file.rfind("/")+1:].replace(".json", "")+"_new.pck")
+    print(pck_path)
