@@ -1,5 +1,6 @@
 import json
 import time
+import sys
 import pck_tools
 from tkinter.filedialog import *
 
@@ -99,6 +100,44 @@ def add_and_update(old, new):
     return old_updated
 
 
+def user_resolver(old, new):
+    # resolve changed values
+    new_values = get_changed_values(old, new, True)
+    old_values = get_changed_values(old, new, False)
+    for hash in new_values["files"]:
+
+        for key in new_values["files"][hash]["dict"]:
+            # print each changed key
+            sys.stdout.write("\033[;1m")
+            # print each new hash
+            print("[{}]".format(hash.upper()))
+            print("\t{}".format(key))
+            # reset colors
+            sys.stdout.write("\033[0;0m")
+
+            new_val = new_values["files"][hash]["dict"][key]
+            old_val = old_values["files"][hash]["dict"][key]
+
+            # print old value in red
+            sys.stdout.write("\033[1;31m")
+            print("\t\t{}".format(old_val))
+            # print new value in green
+            sys.stdout.write("\033[0;32m")
+            print("\t\t{}".format(new_val))
+            # reset colors
+            sys.stdout.write("\033[0;0m")
+
+            # change if empty input
+            if len(input("\r\t\t")) == 0:
+                old["files"][hash]["dict"][key] = new_val
+                # print action
+                print("\r\tUpdated!~")
+            else:
+                print("\r\tSkipped!~")
+
+    return old
+
+
 print()
 Tk().withdraw()
 old_path = askopenfilename(title="Open first file...")
@@ -124,6 +163,7 @@ print("4) get full difference")
 print("5) add only")
 print("6) update only")
 print("7) add and update")
+print("8) resolve update values")
 print()
 
 action = None
@@ -154,6 +194,9 @@ elif action == 6:
 # add & update content
 elif action == 7:
     content_json = add_and_update(old_json, new_json)
+# add & update with user resolving conflicts
+elif action == 8:
+    content_json = user_resolver(old_json, new_json)
 
 
 if content_json is not None:
