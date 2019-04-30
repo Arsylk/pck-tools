@@ -154,7 +154,6 @@ if __name__ == '__main__':
     print(new_path)
     print()
 
-
     print()
     print("Pick action: ")
     print("1) get new keys")
@@ -198,7 +197,6 @@ if __name__ == '__main__':
     # add & update with user resolving conflicts
     elif action == 8:
         content_json = user_resolver(old_json, new_json)
-
 
     if content_json is not None:
         content_text = json.dumps(content_json, sort_keys=False, indent=4, ensure_ascii=False)
