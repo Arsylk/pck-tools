@@ -138,77 +138,78 @@ def user_resolver(old, new):
     return old
 
 
-print()
-Tk().withdraw()
-old_path = askopenfilename(title="Open first file...")
-new_path = askopenfilename(title="Open second file...")
-
-old_json = pck_tools.read_json(old_path)
-print("First file: [{} | {}]".format(old_json["name"], old_json["date"]))
-print(old_path)
-print()
-
-new_json = pck_tools.read_json(new_path)
-print("Second file: [{} | {}]".format(new_json["name"], new_json["date"]))
-print(new_path)
-print()
-
-
-print()
-print("Pick action: ")
-print("1) get new keys")
-print("2) get new changed values")
-print("3) get old changed values")
-print("4) get full difference")
-print("5) add only")
-print("6) update only")
-print("7) add and update")
-print("8) resolve update values")
-print()
-
-action = None
-try:
-    action = int(input())
-except Exception:
-    exit("Incorrect action picked!")
-
-content_json = None
-# new keys
-if action == 1:
-    content_json = get_new_keys(old_json, new_json)
-# changed values new
-elif action == 2:
-    content_json = get_changed_values(old_json, new_json, True)
-# changed values old
-elif action == 3:
-    content_json = get_changed_values(old_json, new_json, False)
-# full difference
-elif action == 4:
-    content_json = get_full_difference(old_json, new_json)
-# add keys
-elif action == 5:
-    content_json = add_new_keys(old_json, new_json)
-# update values
-elif action == 6:
-    content_json = update_values(old_json, new_json)
-# add & update content
-elif action == 7:
-    content_json = add_and_update(old_json, new_json)
-# add & update with user resolving conflicts
-elif action == 8:
-    content_json = user_resolver(old_json, new_json)
-
-
-if content_json is not None:
-    content_text = json.dumps(content_json, sort_keys=False, indent=4, ensure_ascii=False)
-    content_bin = content_text.encode("utf-8")
+if __name__ == '__main__':
     print()
-    print(content_text)
-    print()
-    print("Press any key to save file...")
-    input()
+    Tk().withdraw()
+    old_path = askopenfilename(title="Open first file...")
+    new_path = askopenfilename(title="Open second file...")
 
-    file = asksaveasfile(mode="wb", initialfile=content_json["name"], defaultextension=".json")
-    if file:
-        file.write(content_bin)
-        file.close()
+    old_json = pck_tools.read_json(old_path)
+    print("First file: [{} | {}]".format(old_json["name"], old_json["date"]))
+    print(old_path)
+    print()
+
+    new_json = pck_tools.read_json(new_path)
+    print("Second file: [{} | {}]".format(new_json["name"], new_json["date"]))
+    print(new_path)
+    print()
+
+
+    print()
+    print("Pick action: ")
+    print("1) get new keys")
+    print("2) get new changed values")
+    print("3) get old changed values")
+    print("4) get full difference")
+    print("5) add only")
+    print("6) update only")
+    print("7) add and update")
+    print("8) resolve update values")
+    print()
+
+    action = None
+    try:
+        action = int(input())
+    except Exception:
+        exit("Incorrect action picked!")
+
+    content_json = None
+    # new keys
+    if action == 1:
+        content_json = get_new_keys(old_json, new_json)
+    # changed values new
+    elif action == 2:
+        content_json = get_changed_values(old_json, new_json, True)
+    # changed values old
+    elif action == 3:
+        content_json = get_changed_values(old_json, new_json, False)
+    # full difference
+    elif action == 4:
+        content_json = get_full_difference(old_json, new_json)
+    # add keys
+    elif action == 5:
+        content_json = add_new_keys(old_json, new_json)
+    # update values
+    elif action == 6:
+        content_json = update_values(old_json, new_json)
+    # add & update content
+    elif action == 7:
+        content_json = add_and_update(old_json, new_json)
+    # add & update with user resolving conflicts
+    elif action == 8:
+        content_json = user_resolver(old_json, new_json)
+
+
+    if content_json is not None:
+        content_text = json.dumps(content_json, sort_keys=False, indent=4, ensure_ascii=False)
+        content_bin = content_text.encode("utf-8")
+        print()
+        print(content_text)
+        print()
+        print("Press any key to save file...")
+        input()
+
+        file = asksaveasfile(mode="wb", initialfile=content_json["name"], defaultextension=".json")
+        if file:
+            file.write(content_bin)
+            file.close()
