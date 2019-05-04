@@ -3,10 +3,16 @@ import binascii
 import os
 import shutil
 import json
+import locale
 
 import pck_crypt
 import pck_struct
 import yappy
+
+
+# fix for different system locales
+locale.setlocale(locale.LC_ALL, 'English_United States.1252')
+
 
 def print_hex(binary):
     print(*["{:02X}".format(x) for x in binary])
