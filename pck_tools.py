@@ -43,27 +43,32 @@ def unpack_pck(path, lang=None):
             offset = unpack('i', file.read(4))[0]
             size_p = unpack('i', file.read(4))[0]
             size = unpack('i', file.read(4))[0]
-            noidea = binascii.hexlify(file.read(4)).decode("utf-8")
+            noidea = unpack('i', file.read(4))[0]
 
+            # save header position
             start = file.tell()
-
             file.seek(offset)
-            ext = binascii.hexlify(file.read(4)).decode("utf-8")
-            file.seek(-4, 1)
+
+            # read to byte array
+            file_bytes = file.read(size_p)
+
+            # perform necessary operations
+            if flag == 1:
+                file_bytes = yappy.yappy_uncompress(file_bytes, size)
+            elif flag == 2:
+                old_size = len(file_bytes)
+                file_bytes = pck_crypt.decrypt(file_bytes)
+                print("new_size:", len(file_bytes), "old_size:", old_size, "size:", size, "size_p:", size_p)
+            elif flag == 3:
+                file_bytes = yappy.yappy_uncompress(pck_crypt.decrypt(file_bytes), size)
+            file_path = save_file(file_bytes, path[:path.rfind(".")], "{:08d}".format(i))
+
+            ext = file_bytes[0] & 0xFF
 
             print("File {:2d}/{:d}: [{:016X} | {:6d} bytes or {:6d}] {} {:02d} {}".format(i+1, count, offset, size, size_p, hash.upper(), flag, noidea))
-            file_bytes = file.read(size)
-
-            if flag == 1:
-                file_path = save_file(yappy.yappy_uncompress(file_bytes, size), path[:path.rfind(".")], "{:08d}".format(i))
-            elif flag == 2:
-                file_path = save_file(pck_crypt.decrypt(file_bytes), path[:path.rfind(".")], "{:08d}".format(i))
-            elif flag == 3:
-                file_path = save_file(yappy.yappy_uncompress(pck_crypt.decrypt(file_bytes), size), path[:path.rfind(".")], "{:08d}".format(i))
-            else:
-                file_path = save_file(file_bytes, path[:path.rfind(".")], "{:08d}".format(i))
-
             pck.add_file(file_path, hash, flag, ext)
+
+            # restore header position
             file.seek(start, 0)
         print()
         pck.write_header()
@@ -117,6 +122,70 @@ def merge_pck(kr_file, en_file, fl_file):
 
     return fl_pck
 
+def pck_to_model(pck):
+    # get model.json file
+    model_json = None
+    for pck_file in pck.get_files():
+        if pck_file.get_ext_string() == "json":
+            # test each json file
+            test_json = read_json(pck_file.path)
+            if test_json:
+                if "version" in test_json and "model" in test_json and "textures" in test_json:
+                    model_json = test_json
+                    new_path = os.path.join(os.path.dirname(pck_file.path), "model.json")
+                    os.rename(pck_file.path, new_path)
+                    pck.get_file(hash=pck_file.hash).path = new_path
+                    pck.get_file(hash=pck_file.hash).ext = 1
+                    break
+
+    # get & rename dat file
+    try:
+        pck_file_dat = next(pck_file for pck_file in pck.get_files() if pck_file.get_ext_string() == "dat")
+        if pck_file_dat:
+            new_path = os.path.join(os.path.dirname(pck_file_dat.path), model_json["model"])
+            os.rename(pck_file_dat.path, new_path)
+            pck.get_file(hash=pck_file_dat.hash).path = new_path
+    except Exception as e:
+        print(str(e))
+
+    # get & rename png files
+    try:
+        pck_files_png = list(pck_file for pck_file in pck.get_files() if pck_file.get_ext_string() == "png")
+        for index, texture_json in enumerate(model_json["textures"]):
+            new_path = os.path.join(os.path.dirname(pck_file.path), texture_json)
+            os.rename(pck_files_png[index].path, new_path)
+            pck.get_file(hash=pck_files_png[index].hash).path = new_path
+    except Exception as e:
+        print(str(e))
+
+
+    # get & rename mtn files
+    try:
+        pck_files_mtn = list(pck_file for pck_file in pck.get_files() if pck_file.get_ext_string() == "mtn")
+        for index, motion_json in enumerate(motion_json[0] for motion_json in model_json["motions"].values()):
+            new_path = os.path.join(os.path.dirname(pck_file.path), motion_json["file"])
+            os.rename(pck_files_mtn[index].path, new_path)
+            pck.get_file(hash=pck_files_mtn[index].hash).path = new_path
+    except Exception as e:
+        print(str(e))
+
+    # get & rename expression files
+    try:
+        pck_files_exp = list(pck_file for pck_file in pck.get_files() if pck_file.get_ext_string() == "json")
+        for index, expression_json in enumerate(model_json["expressions"]):
+            new_path = os.path.join(os.path.dirname(pck_file.path), expression_json["file"])
+            os.rename(pck_files_exp[index].path, new_path)
+            pck.get_file(hash=pck_files_exp[index].hash).path = new_path
+    except Exception as e:
+        pass
+
+    # TEMP
+    for pck_file in pck.get_files():
+        print(pck_file.path, pck_file.ext, pck_file.get_ext_string())
+
+    # update _header
+    pck.write_header()
+
 
 def from_header(path):
     folder = path[:path.rfind("/")]
@@ -127,7 +196,6 @@ def from_header(path):
             pck.add_file(folder+"/"+key, _header[key], 00, 00)
             print(pck.get_file(hash=_header[key]))
         return pck
-
 
 
 def form_dict(dict, line_type, comment):

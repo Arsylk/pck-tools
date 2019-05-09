@@ -34,7 +34,7 @@ def yappy_uncompress(data, size):
         if not data_p+1 < len(data):
             return data
 
-        index = data[data_p]
+        index = data[data_p] & 0xFF
         if index < 32:
             to.extend(data[data_p + 1:][:index + 1])
             to_p += index + 1
@@ -42,7 +42,7 @@ def yappy_uncompress(data, size):
         else:
             info = _yappy_info[index]
             length = info & 0x00ff
-            offset = (info & 0xff00) + data[data_p+1]
+            offset = (info & 0xff00) + (data[data_p+1] & 0xFF)
             to.extend(to[to_p - offset:][:length])
             to_p += length
             data_p += 2

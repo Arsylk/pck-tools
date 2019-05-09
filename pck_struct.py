@@ -32,6 +32,7 @@ class Pck:
 class PckFile:
     SPACE = 0
     EQUALS = 1
+    EXT_STR = {109: "dat", 35: "mtn", 137: "png", 123: "json"}
 
     def __init__(self, path, hash, flag, ext, lang=None):
         self.path = path
@@ -67,7 +68,8 @@ class PckFile:
             if line.startswith("//"):
                 continue
             entry = self.line(line)
-            self.dict[entry[0]] = entry[1]
+            if entry is not None:
+                self.dict[entry[0]] = entry[1]
         return self.dict
 
     def line(self, line):
@@ -77,7 +79,7 @@ class PckFile:
                 index = i
                 break
         if index == -1:
-            raise Exception("wrong line format")
+            return None
 
         key = line[:index].rstrip()
         value = line[index:].lstrip().replace("[value]", "{value}").replace("[value_1]", "{value_1}")
@@ -90,6 +92,11 @@ class PckFile:
             self.line_type = self.SPACE
 
         return key, value
+
+    def get_ext_string(self):
+        if self.ext in PckFile.EXT_STR:
+            return PckFile.EXT_STR[self.ext]
+        return "unk"
 
     def __str__(self):
         return "<pck_struct._PckFile hash={} path={} ext={} flag={:02d} lang={}>"\

@@ -4,5 +4,6 @@ key = b"\x37\xea\x79\x85\x86\x29\xec\x94\x85\x20\x7c\x1a\x62\xc3\x72\x4f\x72\x75
 decipher = AES.new(key, AES.MODE_ECB)
 
 def decrypt(file_bytes):
-    file_bytes += (16 - (len(file_bytes) % 16))*b"\x00"
-    return decipher.decrypt(file_bytes)
+    padding = (16 - (len(file_bytes) % 16))
+    file_bytes += padding * b"\x00"
+    return decipher.decrypt(file_bytes)[:len(file_bytes)-padding]
