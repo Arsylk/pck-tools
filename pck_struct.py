@@ -1,4 +1,5 @@
 import json
+import os.path
 
 
 class Pck:
@@ -24,7 +25,7 @@ class Pck:
     def write_header(self):
         _header = {}
         for i, file in enumerate(self.files):
-            _header[file.path[file.path.rfind("/")+1:]] = file.hash
+            _header[os.path.basename(file.path)] = file.hash
         with open(self.path[:self.path.rfind(".")]+"/_header", "w") as output:
             output.write(json.dumps(_header, sort_keys=False, indent=4))
 

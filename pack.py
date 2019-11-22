@@ -1,16 +1,13 @@
-from tkinter import Tk
-from tkinter.filedialog import *
 import sys
 import pck_tools
 
-
-# path = "E:/Android/AndroidProjects/RIP Banana/files/locale.pck"
-# sys.argv.append(path)
 
 path = None
 if len(sys.argv) > 1:
     path = sys.argv[1]
 else:
+    from tkinter import Tk
+    from tkinter.filedialog import *
     Tk().withdraw()
     path = askopenfilename(title="Open _header file...")
 if path:

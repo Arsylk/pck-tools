@@ -11,11 +11,13 @@ import yappy
 
 
 # fix for different system locales
-locale.setlocale(locale.LC_ALL, 'English_United States.1252')
-
+try:
+    locale.setlocale(locale.LC_ALL, 'English_United States.1252')
+except:
+    pass
 
 def print_hex(binary):
-    print(*["{:02X}".format(x) for x in binary])
+    print(' '.join(["{:02X}".format(x) for x in binary]))
 
 def save_file(content, dir, name):
     if not os.path.isdir(dir):
@@ -58,12 +60,12 @@ def unpack_pck(path, lang=None):
             elif flag == 2:
                 old_size = len(file_bytes)
                 file_bytes = pck_crypt.decrypt(file_bytes)
-                print("new_size:", len(file_bytes), "old_size:", old_size, "size:", size, "size_p:", size_p)
             elif flag == 3:
                 file_bytes = yappy.yappy_uncompress(pck_crypt.decrypt(file_bytes), size)
             file_path = save_file(file_bytes, path[:path.rfind(".")], "{:08d}".format(i))
 
-            ext = file_bytes[0] & 0xFF
+            if len(file_bytes) > 0:
+                ext = file_bytes[0] & 0xFF
 
             print("File {:2d}/{:d}: [{:016X} | {:6d} bytes or {:6d}] {} {:02d} {}".format(i+1, count, offset, size, size_p, hash.upper(), flag, noidea))
             pck.add_file(file_path, hash, flag, ext)
